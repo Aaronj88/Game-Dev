@@ -67,7 +67,7 @@ respawn_coin()
 
 #crystal
 crystal_img = pygame.image.load("crystal.png").convert_alpha()
-crystal_img = pygame.transform.scale(crystal_img, (200,200))
+crystal_img = pygame.transform.scale(crystal_img, (200,150))
 crystal_active = False
 crystal_time = 0
 
@@ -151,19 +151,33 @@ def add_life():
 
 
 def spawn_wall():
-    if plyr_rect.x - coin_rect.x > plyr_rect.y - coin_rect.y:
-        wmin, wmax = 60, 300
+    global w_, h_, x, y
+    if abs(plyr_rect.x - coin_rect.x) > abs(plyr_rect.y - coin_rect.y):
+        wmin, wmax = 10,80
         hmin, hmax = 20, 150
+        h_ = random.randint(hmin, hmax) + abs(plyr_rect.y - coin_rect.y)
+        w_ = random.randint(wmin,wmax)
+        x = ((plyr_rect.x + coin_rect.x) / 2) + random.randint(-20,20)
+        if plyr_rect.y < coin_rect.y:
+            y = plyr_rect.y - random.randint(20,100)
+        else:
+            y = coin_rect.y - random.randint(20,100)
+        
+    else:
+        hmin, hmax = 10,80
+        wmin, wmax = 20,150
+        h_ = random.randint(hmin,hmax)
+        w_ = random.randint(wmin, wmax) + abs(plyr_rect.x - coin_rect.x)
+        y = ((plyr_rect.y + coin_rect.y) / 2) + random.randint(-20,20)
+        if plyr_rect.x < coin_rect.x:
+            x = plyr_rect.x - random.randint(20,100)
+        else:
+            x = coin_rect.x - random.randint(20,100)
 
 
     tries = 0
 
     while tries < 40:
-        w_ = random.randint(wmin, wmax)
-        h_ = random.randint(hmin, hmax)
-        x = random.randint(0, WIDTH - w_)
-        y = random.randint(STATUS_BAR_HEIGHT + 10, HEIGHT - h_)
-
         rect = pygame.Rect(x, y, w_, h_)
 
         if not rect.colliderect(plyr_rect.inflate(120,120)) and not rect.colliderect(coin_rect.inflate(80,80)):
@@ -183,7 +197,7 @@ def spawn_crystal():
     global crystal_active, crystal_rect, crystal_scaled, crystal_time
 
     size = max(25, int(c_size * 1.4))
-    crystal_scaled = pygame.transform.scale(crystal_img, (size, size * 2))
+    crystal_scaled = pygame.transform.scale(crystal_img, (20,50))
     crystal_rect = crystal_scaled.get_rect()
     crystal_rect.x = random.randint(10, WIDTH - crystal_rect.width - 10)
     crystal_rect.y = random.randint(STATUS_BAR_HEIGHT + 10, HEIGHT - crystal_rect.height - 10)
@@ -201,7 +215,7 @@ def add_points():
     if plyr_rect.colliderect(coin_rect):
         points += 1
         c_size -= 1
-        if c_size <= 5:
+        if c_size <= 10:
             c_size = int(base_size * 0.9)
 
         p_speed += 12.0
@@ -282,8 +296,8 @@ def draw_status_bar():
     #points and level
     ptxt = font.render(f"Points: {points}",1,txt_c)
     ltxt = font.render(f"Level: {level}/10",1,txt_c)
-    scr.blit(ptxt, (WIDTH-125, 20))
-    scr.blit(ltxt, (WIDTH-150, 60))
+    scr.blit(ptxt, (WIDTH-185, 20))
+    scr.blit(ltxt, (WIDTH-185, 60))
 
 
 def draw():
@@ -306,8 +320,7 @@ def draw():
         scr.blit(txt, (WIDTH//2 - txt.get_width()//2, HEIGHT//3))
 
     if game_over_state:
-        txt = font_big.render("Game Over", 1, r)
-        scr.blit(txt, (WIDTH//2 - txt.get_width()//2, HEIGHT//3))
+        pygame.image.load() #UNFINISHED
 
 
 def main():
